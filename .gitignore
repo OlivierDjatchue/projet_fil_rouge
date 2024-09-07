@@ -1,0 +1,12 @@
+# Ignore SSH keys
+/ansible_resources/*.pem
+/terraform_resourses/*.pem
+
+/terraform_resourses/*.pem
+# Ignore specific Kubernetes secret configuration
+/k8s_resources/pgadmin/pgadmin-secret.yml
+
+# Ignore all .terraform folders and their contents
+**/.terraform/*
+
+

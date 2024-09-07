@@ -1,0 +1,40 @@
+version: '3.1'
+
+services:
+  {{ db_service_name }}:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: odoo
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: odoo
+    volumes:
+      - {{ odoo_db_volume }}:{{ db_mount_dir }}
+    networks:
+      - odoo_network
+    container_name: {{ db_container_name }}
+
+  {{ odoo_service_name }}:
+    image: odoo:17.0
+    depends_on:
+      - {{ db_service_name }}
+    ports:
+      - "8069:8069"
+    environment:
+      - HOST={{ db_service_name }}
+      - USER=odoo
+      - PASSWORD=odoo
+    volumes:
+      - {{ odoo_web_volume }}:{{ web_mount_dir }}
+    networks:
+      - odoo_network
+    container_name: {{ odoo_container_name }}
+
+networks:
+  odoo_network:
+  
+
+volumes:
+  {{ odoo_db_volume }}:
+  {{ odoo_web_volume }}:
+
+

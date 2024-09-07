@@ -1,0 +1,9 @@
+network_name: odoo_network
+odoo_db_volume: odoo-db-data
+odoo_web_volume: odoo-web-data
+db_mount_dir: /var/lib/postgresql/data
+web_mount_dir: /var/lib/odoo
+odoo_service_name: odoo
+db_service_name: db
+odoo_container_name: odoo_container
+db_container_name: db_container

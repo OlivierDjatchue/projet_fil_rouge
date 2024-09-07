@@ -1,0 +1,25 @@
+version: '3.3'
+
+services:
+  {{ pgadmin_service_name }}:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_LISTEN_PORT: {{ pgadmin_listen_port }}
+    ports:
+      - "{{ pgadmin_host_port }}:{{ pgadmin_listen_port }}"
+    volumes:
+      - {{ pgadmin_data_volume }}:{{ pgadmin_mount_dir }}
+      - {{ servers_json_path }}:/pgadmin4/servers.json
+    networks:
+      - {{ system_user}}_{{ network_name }}
+    container_name: {{ pgadmin_container_name }}
+
+networks:
+  {{ system_user}}_{{ network_name }}:
+    external: true
+
+volumes:
+  {{ pgadmin_data_volume }}:
+

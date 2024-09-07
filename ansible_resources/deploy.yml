@@ -1,0 +1,8 @@
+---
+- name: Install odoo and pgadmin
+  hosts: all
+  become: true 
+  roles:
+    - odoo-role
+    - pgadmin-role
+ 

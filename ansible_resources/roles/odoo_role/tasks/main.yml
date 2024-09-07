@@ -1,0 +1,6 @@
+- name: Deploy Odoo using Docker Compose
+  template:
+    src: docker-compose.yml.j2
+    dest: /path/to/your/docker-compose/odoo-compose.yml
+- name: Ensure Docker Compose is up
+  command: docker-compose -f /path/to/your/docker-compose/odoo-compose.yml up -d

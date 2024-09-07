@@ -1,0 +1,8 @@
+---
+# tasks file for pgadmin-role
+- name: Deploy pgAdmin using Docker Compose
+  template:
+    src: docker-compose.yml.j2
+    dest: /home/{{ system_user }}/pgadmin-compose.yml
+- name: Ensure Docker Compose is up
+  command: /usr/local/bin/docker-compose  -f /home/{{ system_user }}/pgadmin-compose.yml up -d
