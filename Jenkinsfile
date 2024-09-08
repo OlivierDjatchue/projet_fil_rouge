@@ -1,7 +1,7 @@
 pipeline{
     environment {
         INAGE_NAME ="website_img"
-        INAGE_TAG ="latest"
+        INAGE_TAG =1.2
         STAGING = "$USER-website-staging"
         PRODUCTION = "$USER-website-prod"
         ENDPOINT="http://10.0.4.5"
