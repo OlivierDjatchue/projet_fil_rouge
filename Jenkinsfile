@@ -4,7 +4,7 @@ pipeline{
         INAGE_TAG =1.2
         STAGING = "$USER-website-staging"
         PRODUCTION = "$USER-website-prod"
-        ENDPOINT="http://10.0.4.5"
+        ENDPOINT="http:100.29.86.67"
         DOCKERHUB_CREDENTIALS = credentials('dockerhub_passowrd')
         USER = 'olivierdja'
     }
@@ -35,7 +35,7 @@ pipeline{
             steps{
                 script {
                     sh '''
-                    docker run --name=$INAGE_NAME -dp 83:80 -e PORT=80 $USER/$INAGE_NAME:$INAGE_TAG
+                    docker run --name=$INAGE_NAME -dp 83:8080 -e PORT=8080 $USER/$INAGE_NAME:$INAGE_TAG
                     sleep 5
                     
                     '''
@@ -48,7 +48,7 @@ pipeline{
             steps{
                 script {
                     sh '''
-                    curl $ENDPOINT:83 | grep "Dimension"
+                    curl $ENDPOINT:83 | grep "HOME | IC GROUP"
                     
                     '''
                 }
