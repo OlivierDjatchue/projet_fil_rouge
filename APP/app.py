@@ -10,6 +10,7 @@ app = Flask(__name__)
 # Get Odoo Url
 ODOO_URL = os.environ.get('ODOO_URL')
 PGADMIN_URL = os.environ.get('PGADMIN_URL')
+PORT=8080
 
 @app.route("/")
 def main():
@@ -53,4 +54,4 @@ if __name__ == "__main__":
         PGADMIN_URL="https://www.youtube.com/"
 
     # Run Flask Application
-    app.run(host="0.0.0.0", port=8080)
+    app.run(host="0.0.0.0", port=PORT)
