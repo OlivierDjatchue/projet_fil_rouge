@@ -4,7 +4,7 @@ pipeline{
         INAGE_TAG =1.2
         STAGING = "$USER-website-staging"
         PRODUCTION = "$USER-website-prod"
-        ENDPOINT="http:100.29.86.67"
+        ENDPOINT="http://100.29.86.67"
         DOCKERHUB_CREDENTIALS = credentials('dockerhub_passowrd')
         USER = 'olivierdja'
     }
@@ -48,7 +48,7 @@ pipeline{
             steps{
                 script {
                     sh '''
-                    curl $ENDPOINT:83 | grep GROUP
+                    curl $ENDPOINT:83 | grep "IC GROUP"
                     
                     '''
                 }
