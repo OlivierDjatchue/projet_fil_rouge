@@ -14,7 +14,7 @@ pipeline{
             agent any
             steps{
                 script {
-                    sh 'docker build -t $USER/$INAGE_NAME:$INAGE_TAG .' 
+                    sh 'docker build -t $USER/$INAGE_NAME:$INAGE_TAG ./APP/' 
                 }
             }
         }
