@@ -48,7 +48,7 @@ pipeline{
             steps{
                 script {
                     sh '''
-                    curl $ENDPOINT:83 | grep "GROUP"
+                    curl $ENDPOINT:83 | grep GROUP
                     
                     '''
                 }
