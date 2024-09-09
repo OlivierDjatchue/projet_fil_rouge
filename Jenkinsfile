@@ -62,7 +62,7 @@ stage('Upload Image to DockerHub') {
             script {
                 sh '''
                 echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
-                docker push $DOCKERHUB_CREDENTIALS_USR/$IMAGE_NAME:$IMAGE_TAG
+                docker push $USER/$IMAGE_NAME:$IMAGE_TAG
                 '''
             }
         }
