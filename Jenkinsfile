@@ -5,7 +5,7 @@ pipeline{
         STAGING = "$USER-website-staging"
         PRODUCTION = "$USER-website-prod"
         ENDPOINT="http://100.29.86.67"
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub_passowrd')
+       
         USER = 'olivierdja'
     }
     agent none
