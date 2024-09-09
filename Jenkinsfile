@@ -5,7 +5,6 @@ pipeline{
         STAGING = "$USER-website-staging"
         PRODUCTION = "$USER-website-prod"
         ENDPOINT="http://100.29.86.67"
-       
         USER = 'olivierdja'
     }
     agent none
@@ -56,18 +55,20 @@ pipeline{
         }
        
 
-        stage('Upload Image to DockerHub'){
-            agent any
-            steps{
-                script {
-                    sh '''
-                    echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
-                    docker push  $USER/$INAGE_NAME:$INAGE_TAG
-            
-                    '''
-                }
+stage('Upload Image to DockerHub') {
+    agent any
+    steps {
+        withCredentials([usernamePassword(credentialsId: 'dockerhub_passowrd', usernameVariable: 'DOCKERHUB_CREDENTIALS_USR', passwordVariable: 'DOCKERHUB_CREDENTIALS_PSW')]) {
+            script {
+                sh '''
+                echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
+                docker push $DOCKERHUB_CREDENTIALS_USR/$IMAGE_NAME:$IMAGE_TAG
+                '''
             }
         }
+    }
+}
+
         stage('Deploy to Heroku Staging'){
             when{
                 expression { GIT_BRANCH == 'origin/master'}
