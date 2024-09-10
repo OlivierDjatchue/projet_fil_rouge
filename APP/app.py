@@ -53,5 +53,6 @@ if __name__ == "__main__":
         print("No command line argument or environment variable. Picking a Random url =")
         PGADMIN_URL="https://www.youtube.com/"
 
-    # Run Flask Application
-    app.run(host="0.0.0.0", port=PORT)
+    # Dynamically assign port
+    port = int(os.getenv('PORT', 5000))  # Default to 5000 if PORT is not in the environment variables
+    app.run(host='0.0.0.0', port=port)
