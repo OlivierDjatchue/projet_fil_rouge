@@ -54,5 +54,4 @@ if __name__ == "__main__":
         PGADMIN_URL="https://www.youtube.com/"
 
     # Dynamically assign port
-    port = int(os.getenv('PORT', 8080))  # Default to 5000 if PORT is not in the environment variables
-    app.run(host='0.0.0.0', port=port)
+    app.run(host="0.0.0.0", port=args.port)
