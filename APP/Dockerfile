@@ -17,6 +17,5 @@ RUN pip3 install -r requirements.txt
 # Expose port 8080
 EXPOSE 8080
 
-# Source the environment variables and then run the application
-ENTRYPOINT ["/bin/sh", "-c", ". /etc/profile.d/env_vars.sh && python app.py"]
-
+# Modify ENTRYPOINT to use the PORT environment variable provided by Heroku
+ENTRYPOINT ["/bin/sh", "-c", ". /etc/profile.d/env_vars.sh && python app.py --port $PORT"]
