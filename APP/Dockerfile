@@ -14,8 +14,8 @@ RUN echo 'export ODOO_URL=${ODOO_URL:-'$(awk -F ": " '/ODOO_URL/ {print $2}' rel
 # Install dependencies
 RUN pip3 install -r requirements.txt
 
-# Expose port 8080
-EXPOSE 8080
+# Expose port 5000
+EXPOSE 5000
 
 # Modify ENTRYPOINT to use the PORT environment variable provided by Heroku p python app.py --port $PORT
 
