@@ -15,7 +15,7 @@ RUN echo 'export ODOO_URL=${ODOO_URL:-'$(awk -F ": " '/ODOO_URL/ {print $2}' rel
 RUN pip3 install -r requirements.txt
 
 # Expose port 8080
-EXPOSE 8080
+EXPOSE 8081
 
 # Source the environment variables and then run the application
 ENTRYPOINT ["/bin/sh", "-c", ". /etc/profile.d/env_vars.sh && python app.py"]
