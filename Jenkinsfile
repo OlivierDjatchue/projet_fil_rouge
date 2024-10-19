@@ -47,7 +47,7 @@ pipeline{
             steps{
                 script {
                     sh '''
-                    curl $ENDPOINT:8081 | grep "IC GROUP"
+                    curl $ENDPOINT:3000 | grep "IC GROUP"
                     
                     '''
                 }
