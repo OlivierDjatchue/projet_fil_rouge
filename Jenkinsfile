@@ -34,7 +34,7 @@ pipeline{
             steps{
                 script {
                     sh '''
-                    docker run --name=$INAGE_NAME -dp 3000:3000 -e PORT=3000 $USER/$INAGE_NAME:$INAGE_TAG
+                    docker run --name=$INAGE_NAME -dp 8081:8081 $USER/$INAGE_NAME:$INAGE_TAG
                     sleep 5
                     
                     '''
@@ -47,7 +47,7 @@ pipeline{
             steps{
                 script {
                     sh '''
-                    curl $ENDPOINT:3000 | grep "IC GROUP"
+                    curl $ENDPOINT:8081 | grep "IC GROUP"
                     
                     '''
                 }
