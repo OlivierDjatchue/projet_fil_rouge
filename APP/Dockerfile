@@ -19,7 +19,7 @@ ENV PGADMIN_URL=${PGADMIN_URL_ARG}
 RUN pip3 install -r requirements.txt
 
 # Expose port 5000 (you can adjust as needed)
-EXPOSE 5000
+EXPOSE 3000
 
 # ENTRYPOINT with dynamic port handling using shell
 ENTRYPOINT ["/bin/sh", "-c", "gunicorn --bind 0.0.0.0:${PORT} main:app"]
