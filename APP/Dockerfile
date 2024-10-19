@@ -1,5 +1,4 @@
 # Base image
-# Base image
 FROM python:3.6-alpine
 
 # Set working directory
@@ -19,8 +18,9 @@ ENV PGADMIN_URL=${PGADMIN_URL_ARG}
 # Install dependencies
 RUN pip3 install -r requirements.txt
 
-# Expose port 5000
+# Expose port 5000 (you can adjust as needed)
 EXPOSE 5000
 
-# ENTRYPOINT with dynamic port handling (Heroku provides $PORT)
-ENTRYPOINT ["gunicorn", "--bind", "0.0.0.0:${PORT}", "main:app"]
+# ENTRYPOINT with dynamic port handling using shell
+ENTRYPOINT ["/bin/sh", "-c", "gunicorn --bind 0.0.0.0:${PORT} main:app"]
+
