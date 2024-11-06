@@ -11,7 +11,6 @@ app = Flask(__name__)
 ODOO_URL = os.environ.get('ODOO_URL')
 PGADMIN_URL = os.environ.get('PGADMIN_URL')
 
-
 @app.route("/")
 def main():
     # return 'Hello'
@@ -53,6 +52,5 @@ if __name__ == "__main__":
         print("No command line argument or environment variable. Picking a Random url =")
         PGADMIN_URL="https://www.youtube.com/"
 
-    # Dynamically assign port
-port = int(os.environ.get("PORT", 5000))
-app.run(host='0.0.0.0', port=port)
+    # Run Flask Application
+    app.run(host="0.0.0.0", port=8080)
