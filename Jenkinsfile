@@ -4,7 +4,7 @@ pipeline{
         INAGE_TAG =1.2
         STAGING = "$USER-website-staging"
         PRODUCTION = "$USER-website-prod"
-        ENDPOINT="http://3.88.113.135"
+        ENDPOINT="http://34.228.215.122"
         USER = 'olivierdja'
     }
     agent none
