@@ -1,22 +1,18 @@
-# Base image
 FROM python:3.6-alpine
-
-# Set working directory
-WORKDIR /opt/
-
-# Copy the content of the current directory into the Docker image
-COPY . .
-
-# Extract URLs from releases.txt and export them as environment variables, but allow overriding at runtime
-RUN echo 'export ODOO_URL=${ODOO_URL:-'$(awk -F ": " '/ODOO_URL/ {print $2}' releases.txt)'}' >> /etc/profile.d/env_vars.sh && \
-    echo 'export PGADMIN_URL=${PGADMIN_URL:-'$(awk -F ": " '/PGADMIN_URL/ {print $2}' releases.txt)'}' >> /etc/profile.d/env_vars.sh
-
-# Install dependencies
-RUN pip3 install -r requirements.txt
-
-# Expose port 8080
-EXPOSE 8081
-
-# Source the environment variables and then run the application
-ENTRYPOINT ["/bin/sh", "-c", ". /etc/profile.d/env_vars.sh && python app.py"]
+LABEL maintainer="olivierdja@yahoo.fr"
+WORKDIR /opt
+# Install Flask
+RUN pip install flask
+COPY .  /opt/
+# Set Odoo URL environment variable
+ENV ODOO_URL="https://odoo.com"
+# Set pgAdmin URL environment variable
+ENV PGADMIN_URL="https://pgadmin.org"
+#ENV ODOO_URL=1
+#ENV PGADMIN_URL=1
+#RUN pip3 install 
+EXPOSE 80
+RUN export ODOO_URL=$( avk 'NR==1 {print $2}' /opt/releases.txt ) &&\
+    export PGADMIN_URL=$( avk 'NR==2 {print $2}' /opt/releases.txt ) 
+ENTRYPOINT ["python", "app.py"]
 
