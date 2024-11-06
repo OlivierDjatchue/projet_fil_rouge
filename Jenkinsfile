@@ -34,7 +34,7 @@ pipeline{
             steps{
                 script {
                     sh '''
-                    docker run --name=$INAGE_NAME -dp 83:8081 $USER/$INAGE_NAME:$INAGE_TAG
+                    docker run --name=$INAGE_NAME -dp 83:8080 $USER/$INAGE_NAME:$INAGE_TAG
                     sleep 5
                     
                     '''
