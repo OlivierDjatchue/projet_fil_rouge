@@ -9,4 +9,4 @@ RUN pip install flask
 ENV ODOO_URL="https://odoo.com"
 ENV PGADMIN_URL="https://pgadmin.org"
 EXPOSE 8080
-ENTRYPOINT ["python", "/opt/src/app.py"]
+ENTRYPOINT ["python", "app.py"]
