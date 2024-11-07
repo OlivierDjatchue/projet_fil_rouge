@@ -5,7 +5,8 @@ WORKDIR /opt/
 
 # Copy the content of the current directory into the Docker image
 COPY . .
-RUN pip install flask
+RUN pip install -r requirements.txt
+RUN apk add --no-cache gcc musl-dev linux-headers
 ENV ODOO_URL="https://odoo.com"
 ENV PGADMIN_URL="https://pgadmin.org"
 EXPOSE 8080
