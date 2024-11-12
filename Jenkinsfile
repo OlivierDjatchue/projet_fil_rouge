@@ -1,119 +1,124 @@
-pipeline{
+// This is a sample Jenkinsfile that can be used to deploy a web application on a Kubernetes cluster.
+pipeline {
     environment {
-        INAGE_NAME ="website_img"
-        INAGE_TAG =1.2
-        STAGING = "$USER-website-staging"
-        PRODUCTION = "$USER-website-prod"
-        ENDPOINT="http://34.228.140.182"
-        USER = 'olivierdja'
+        IMAGE_NAME = "ic-webapp"
+        APP_CONTAINER_PORT = "8080"
+        USER = "olivierdja"
+        DOCKERHUB_PASSWORD = credentials('dockerhub_password')
+        ANSIBLE_IMAGE_AGENT = "registry.gitlab.com/robconnolly/docker-ansible:latest"
+        PRIVATE_KEY = credentials('private_key')
+        APP_EXPOSED_PORT = 83
+        HOST_IP = 52.201.244.209
     }
     agent none
-    stages{
-        stage('Build Docker Image'){
+    stages {
+        stage('Build image') {
             agent any
-            steps{
+            steps {
                 script {
-                    sh 'docker build -t $USER/$INAGE_NAME:$INAGE_TAG ./APP/' 
+                    sh 'docker build --no-cache -t $USER/$IMAGE_NAME:$IMAGE_TAG ./APP/'
                 }
             }
         }
-         stage('Clean Up Existing Containers'){
+
+        stage('Run container based on built image') {
             agent any
-            steps{
+            steps {
                 script {
                     sh '''
-                    docker rm -f $INAGE_NAME || echo "Container does not exist"
-                    
+                        echo "Cleaning existing container if exists"
+                        docker ps -a | grep -i $IMAGE_NAME && docker rm -f ${IMAGE_NAME} || true
+                        docker run --name ${IMAGE_NAME} -d -p $APP_EXPOSED_PORT:$APP_CONTAINER_PORT $USER/$IMAGE_NAME:$IMAGE_TAG
+                        sleep 5
                     '''
                 }
             }
         }
 
-        stage('Launch Docker Container'){
+        stage('Test image') {
             agent any
-            steps{
+            steps {
                 script {
                     sh '''
-                    docker run --name=$INAGE_NAME -dp 83:8080 $USER/$INAGE_NAME:$INAGE_TAG
-                    sleep 5
-                    
+                        curl -I http://${HOST_IP}:${APP_EXPOSED_PORT} | grep -i "200"
                     '''
                 }
             }
         }
 
-        stage('Run Tests'){
+        stage('Clean container') {
             agent any
-            steps{
+            steps {
                 script {
                     sh '''
-                    curl $ENDPOINT:83 | grep "IC GROUP"
-                    
+                        docker stop $IMAGE_NAME 
+                        docker rm $IMAGE_NAME
                     '''
                 }
             }
         }
-       
 
-stage('Upload Image to DockerHub') {
-    agent any
-    steps {
-        withCredentials([usernamePassword(credentialsId: 'dockerhub_passowrd', usernameVariable: 'DOCKERHUB_CREDENTIALS_USR', passwordVariable: 'DOCKERHUB_CREDENTIALS_PSW')]) {
-            script {
-                sh '''
-                echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
-                docker push $USER/$INAGE_NAME:$INAGE_TAG
-                '''
+        stage('Login and Push Image on Docker Hub') {
+            agent any
+            steps {
+                script {
+                    sh '''
+                        echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_ID --password-stdin
+                        docker push $USER/$IMAGE_NAME:$IMAGE_TAG
+                    '''
+                }
+            }
+        }
+
+        stage('Prepare Ansible environment') {
+            agent any
+            steps {
+                script {
+                    sh '''
+                        echo $PRIVATE_KEY > id_rsa
+                        chmod 600 id_rsa
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy application') {
+            agent {
+                docker { image 'registry.gitlab.com/robconnolly/docker-ansible:latest' }
+            }
+            stages {
+                stage('Ping targeted hosts') {
+                    steps {
+                        script {
+                            sh '''
+                                apt update -y
+                                anstall sshpass -y 
+                                export ANSIBLE_CONFIG=$(pwd)/ansible-ressources/ansible.cfg
+                                ansible all -m ping --private-key id_rsa 
+                            '''
+                        }
+                    }
+                }
+
+                stage('Deploy the Application') {
+                    when { expression { GIT_BRANCH == 'origin/main' } }
+                    stages {
+                        stage('Install Docker on all hosts') {
+                            steps {
+                                script {
+                                    sh '''
+                                        export ANSIBLE_CONFIG=$(pwd)/ansible-ressources/ansible.cfg
+                                        ansible-playbook ./ansible-ressources/deploy.yml --private-key id_rsa 
+                                    '''
+                                }
+                            }
+                        }
+
+                    }
+                }
             }
         }
     }
 }
 
-        stage('Deploy to Heroku Staging'){
-            when{
-                expression { GIT_BRANCH == 'origin/master'}
-            }
-            agent any
-            environment{
-                HEROKU_API_KEY = credentials('heroku_api_key')
-            }
-            steps{
-                script {
-                    sh '''
-                    sudo npm i -g heroku@7.68.0
-                    heroku container:login
-                    cd APP
-                    heroku create $STAGING || echo "project already exist"
-                    heroku container:push -a $STAGING web
-                    heroku container:release -a $STAGING web
-                    cd ..
-                    
-                    '''
-                }
-            }
-        }
-        stage('Deploy to Heroku Production'){
-            when{
-                expression { GIT_BRANCH == 'origin/master'}
-            }
-            agent any
-            environment{
-                HEROKU_API_KEY = credentials('heroku_api_key')
-            }
-            steps{
-                script {
-                    sh '''
-                  sudo npm i -g heroku@7.68.0
-                  heroku container:login
-                  cd APP
-                  heroku create $PRODUCTION || echo "project already exist"
-                  heroku container:push -a $PRODUCTION web
-                  heroku container:release -a $PRODUCTION web
-                  cd ..
-                    
-                    '''
-                }
-            }
-        }
-    }
-}
+
