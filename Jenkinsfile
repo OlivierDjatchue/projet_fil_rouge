@@ -7,8 +7,8 @@ pipeline {
         DOCKERHUB_PASSWORD = credentials('dockerhub_password')
         ANSIBLE_IMAGE_AGENT = "registry.gitlab.com/robconnolly/docker-ansible:latest"
         PRIVATE_KEY = credentials('private_key')
-        APP_EXPOSED_PORT = 83
-        HOST_IP = 52.201.244.209
+        APP_EXPOSED_PORT = "83"
+        HOST_IP = "52.201.244.209"
     }
     agent none
     stages {
