@@ -93,22 +93,22 @@ pipeline {
                             sh '''
                                 apt update -y
                                 anstall sshpass -y 
-                                export ANSIBLE_CONFIG=$(pwd)/ansible-ressources/ansible.cfg
-                                ansible all -m ping --private-key id_rsa 
+                                export ANSIBLE_CONFIG=$(pwd)/ansible_ressources/ansible.cfg
+                                ansible all -i ./ansible_resources/hosts.yml -m ping --private-key id_rsa 
                             '''
                         }
                     }
                 }
 
                 stage('Deploy the Application') {
-                    when { expression { GIT_BRANCH == 'origin/main' } }
+                    when { expression { GIT_BRANCH == 'origin/master' } }
                     stages {
                         stage('Install Docker on all hosts') {
                             steps {
                                 script {
                                     sh '''
-                                        export ANSIBLE_CONFIG=$(pwd)/ansible-ressources/ansible.cfg
-                                        ansible-playbook ./ansible-ressources/deploy.yml --private-key id_rsa 
+                                        export ANSIBLE_CONFIG=$(pwd)/ansible_ressources/ansible.cfg
+                                        ansible-playbook  -i ./ansible_resources/hosts.yml ./ansible-ressources/deploy.yml -i  --private-key id_rsa 
                                     '''
                                 }
                             }
