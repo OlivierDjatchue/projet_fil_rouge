@@ -2,7 +2,7 @@ pipeline{
     environment {
         INAGE_NAME ="website_img"
         INAGE_TAG =1.2
-        ENDPOINT="http://52.201.244.209"
+        ENDPOINT="http://23.23.71.250"
         USER = 'olivierdja'
     }
     agent none
