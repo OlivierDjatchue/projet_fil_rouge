@@ -6,6 +6,7 @@ pipeline{
         PRODUCTION = "$USER-website-prod"
         ENDPOINT="http://52.201.244.209"
         USER = 'olivierdja'
+        PRIVATE_KEY = credentials('private_key')
     }
     agent none
     stages{
@@ -34,7 +35,7 @@ pipeline{
             steps{
                 script {
                     sh '''
-                    docker run --name=$INAGE_NAME -dp 8081:8081 $USER/$INAGE_NAME:$INAGE_TAG
+                    docker run --name=$INAGE_NAME -dp 83:8080 $USER/$INAGE_NAME:$INAGE_TAG
                     sleep 5
                     
                     '''
@@ -47,7 +48,7 @@ pipeline{
             steps{
                 script {
                     sh '''
-                    curl $ENDPOINT:8081 | grep "IC GROUP"
+                    curl $ENDPOINT:83 | grep "IC GROUP"
                     
                     '''
                 }
@@ -68,7 +69,21 @@ stage('Upload Image to DockerHub') {
         }
     }
 }
+stage('Prepare Ansible environment') {
+            agent any
+            steps {
+                script {
+                    sh '''
+                        echo $PRIVATE_KEY > id_rsa
+                        chmod 600 id_rsa
+                    '''
+                }
+            }
+        }
 
+
+
+        
       
     }
 }
