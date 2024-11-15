@@ -4,6 +4,7 @@ pipeline{
         INAGE_TAG =1.2
         ENDPOINT="http://23.23.71.250"
         USER = 'olivierdja'
+        PRIVATE_KEY = credentials('private_key')
     }
     agent none
     stages{
@@ -66,6 +67,23 @@ pipeline{
         }
     }
 }
+
+        stage('Prepare Ansible environment') {
+            agent any
+            steps {
+                script {
+                    sh '''
+                        echo $PRIVATE_KEY > id_rsa
+                        chmod 600 id_rsa
+                    '''
+                }
+            }
+        }
+
+        
+
+
+        
 
        
     }
