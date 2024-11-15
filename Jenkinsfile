@@ -1,128 +1,74 @@
-// This is a sample Jenkinsfile that can be used to deploy a web application on a Kubernetes cluster.
-pipeline {
+pipeline{
     environment {
-        IMAGE_NAME = "ic-webapp"
-        APP_CONTAINER_PORT = "8080"
-        USER = "olivierdja"
-        ANSIBLE_IMAGE_AGENT = "registry.gitlab.com/robconnolly/docker-ansible:latest"
-        PRIVATE_KEY = credentials('private_key')
-        APP_EXPOSED_PORT = "83"
-        HOST_IP = "52.201.244.209"
+        INAGE_NAME ="website_img"
+        INAGE_TAG =1.2
+        STAGING = "$USER-website-staging"
+        PRODUCTION = "$USER-website-prod"
+        ENDPOINT="http://52.201.244.209"
+        USER = 'olivierdja'
     }
     agent none
-    stages {
-        stage('Build image') {
+    stages{
+        stage('Build Docker Image'){
             agent any
-            steps {
+            steps{
                 script {
-                    sh 'docker build --no-cache -t $USER/$IMAGE_NAME:$IMAGE_TAG ./APP/'
+                    sh 'docker build -t $USER/$INAGE_NAME:$INAGE_TAG ./APP/' 
                 }
             }
         }
-
-        stage('Run container based on built image') {
+         stage('Clean Up Existing Containers'){
             agent any
-            steps {
+            steps{
                 script {
                     sh '''
-                        echo "Cleaning existing container if exists"
-                        docker ps -a | grep -i $IMAGE_NAME && docker rm -f ${IMAGE_NAME} || true
-                        docker run --name ${IMAGE_NAME} -d -p $APP_EXPOSED_PORT:$APP_CONTAINER_PORT $USER/$IMAGE_NAME:$IMAGE_TAG
-                        sleep 5
+                    docker rm -f $INAGE_NAME || echo "Container does not exist"
+                    
                     '''
                 }
             }
         }
 
-        stage('Test image') {
+        stage('Launch Docker Container'){
             agent any
-            steps {
+            steps{
                 script {
                     sh '''
-                        curl -I http://${HOST_IP}:${APP_EXPOSED_PORT} | grep -i "200"
+                    docker run --name=$INAGE_NAME -dp 8081:8081 $USER/$INAGE_NAME:$INAGE_TAG
+                    sleep 5
+                    
                     '''
                 }
             }
         }
 
-        stage('Clean container') {
+        stage('Run Tests'){
             agent any
-            steps {
+            steps{
                 script {
                     sh '''
-                        docker stop $IMAGE_NAME 
-                        docker rm $IMAGE_NAME
+                    curl $ENDPOINT:8081 | grep "IC GROUP"
+                    
                     '''
                 }
             }
         }
+       
 
- stage('Upload Image to DockerHub') {
-            agent any
-            steps {
-                // Wrapping with node block for proper context
-                node {
-                    withCredentials([usernamePassword(credentialsId: 'dockerhub_passowrd', usernameVariable: 'DOCKERHUB_CREDENTIALS_USR', passwordVariable: 'DOCKERHUB_CREDENTIALS_PSW')]) {
-                        script {
-                            sh '''
-                            echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
-                            docker push $USER/$IMAGE_NAME:$IMAGE_TAG
-                            '''
-                        }
-                    }
-                }
-            }
-        }
-
-        stage('Prepare Ansible environment') {
-            agent any
-            steps {
-                script {
-                    sh '''
-                        echo $PRIVATE_KEY > id_rsa
-                        chmod 600 id_rsa
-                    '''
-                }
-            }
-        }
-
-        stage('Deploy application') {
-            agent {
-                docker { image 'registry.gitlab.com/robconnolly/docker-ansible:latest' }
-            }
-            stages {
-                stage('Ping targeted hosts') {
-                    steps {
-                        script {
-                            sh '''
-                                apt update -y
-                                anstall sshpass -y 
-                                export ANSIBLE_CONFIG=$(pwd)/ansible_ressources/ansible.cfg
-                                ansible all -i ./ansible_resources/hosts.yml -m ping --private-key id_rsa 
-                            '''
-                        }
-                    }
-                }
-
-                stage('Deploy the Application') {
-                    when { expression { GIT_BRANCH == 'origin/master' } }
-                    stages {
-                        stage('Install Docker on all hosts') {
-                            steps {
-                                script {
-                                    sh '''
-                                        export ANSIBLE_CONFIG=$(pwd)/ansible_ressources/ansible.cfg
-                                        ansible-playbook  -i ./ansible_resources/hosts.yml ./ansible-ressources/deploy.yml -i  --private-key id_rsa 
-                                    '''
-                                }
-                            }
-                        }
-
-                    }
-                }
+stage('Upload Image to DockerHub') {
+    agent any
+    steps {
+        withCredentials([usernamePassword(credentialsId: 'dockerhub_passowrd', usernameVariable: 'DOCKERHUB_CREDENTIALS_USR', passwordVariable: 'DOCKERHUB_CREDENTIALS_PSW')]) {
+            script {
+                sh '''
+                echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
+                docker push $USER/$INAGE_NAME:$INAGE_TAG
+                '''
             }
         }
     }
 }
 
-
+      
+    }
+}
