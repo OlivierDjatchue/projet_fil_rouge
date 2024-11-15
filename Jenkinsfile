@@ -57,19 +57,22 @@ pipeline {
             }
         }
 
-stage('Upload Image to DockerHub') {
-    agent any
-    steps {
-        withCredentials([usernamePassword(credentialsId: 'dockerhub_passowrd', usernameVariable: 'DOCKERHUB_CREDENTIALS_USR', passwordVariable: 'DOCKERHUB_CREDENTIALS_PSW')]) {
-            script {
-                sh '''
-                echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
-                docker push $USER/$INAGE_NAME:$INAGE_TAG
-                '''
+ stage('Upload Image to DockerHub') {
+            agent any
+            steps {
+                // Wrapping with node block for proper context
+                node {
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub_passowrd', usernameVariable: 'DOCKERHUB_CREDENTIALS_USR', passwordVariable: 'DOCKERHUB_CREDENTIALS_PSW')]) {
+                        script {
+                            sh '''
+                            echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
+                            docker push $USER/$IMAGE_NAME:$IMAGE_TAG
+                            '''
+                        }
+                    }
+                }
             }
         }
-    }
-}
 
         stage('Prepare Ansible environment') {
             agent any
