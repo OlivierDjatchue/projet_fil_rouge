@@ -7,6 +7,7 @@ pipeline{
         ENDPOINT="http://52.201.244.209"
         USER = 'olivierdja'
         PRIVATE_KEY = credentials('private_key')
+       
     }
     agent none
     stages{
@@ -80,6 +81,9 @@ stage('Prepare Ansible environment') {
                 }
             }
         }
+
+    }
+}
 
 
 
