@@ -2,12 +2,8 @@ pipeline{
     environment {
         INAGE_NAME ="website_img"
         INAGE_TAG =1.2
-        STAGING = "$USER-website-staging"
-        PRODUCTION = "$USER-website-prod"
         ENDPOINT="http://52.201.244.209"
         USER = 'olivierdja'
-        PRIVATE_KEY = credentials('private_key')
-       
     }
     agent none
     stages{
@@ -57,37 +53,20 @@ pipeline{
         }
        
 
-stage('Upload Image to DockerHub') {
-    agent any
-    steps {
-        withCredentials([usernamePassword(credentialsId: 'dockerhub_passowrd', usernameVariable: 'DOCKERHUB_CREDENTIALS_USR', passwordVariable: 'DOCKERHUB_CREDENTIALS_PSW')]) {
-            script {
-                sh '''
-                echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
-                docker push $USER/$INAGE_NAME:$INAGE_TAG
-                '''
-            }
-        }
-    }
-}
-stage('Prepare Ansible environment') {
+        stage('Upload Image to DockerHub') {
             agent any
             steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub_passowrd', usernameVariable: 'DOCKERHUB_CREDENTIALS_USR', passwordVariable: 'DOCKERHUB_CREDENTIALS_PSW')]) {
                 script {
                     sh '''
-                        echo $PRIVATE_KEY > id_rsa
-                        chmod 600 id_rsa
+                    echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
+                    docker push $USER/$INAGE_NAME:$INAGE_TAG
                     '''
-                }
             }
         }
-
     }
 }
 
-
-
-        
-      
+       
     }
 }
