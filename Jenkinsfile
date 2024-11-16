@@ -5,7 +5,7 @@ pipeline {
         ENDPOINT = "http://23.23.71.250"
         USER = 'olivierdja'
         PRIVATE_KEY = credentials('private_key')
-        ANSIBLE_IMAGE_AGENT = "registry.gitlab.com/robconnolly/docker-ansible:latest"
+        ANSIBLE_IMAGE_AGENT = "docker.io/olivierdja/ansible-prepped"
     }
     agent none
     stages {
