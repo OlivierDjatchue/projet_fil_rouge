@@ -1,130 +1,91 @@
-pipeline{
+pipeline {
     environment {
-        INAGE_NAME ="website_img"
-        INAGE_TAG =1.2
-        ENDPOINT="http://23.23.71.250"
+        IMAGE_NAME = "website_img"
+        IMAGE_TAG = "1.2"
+        ENDPOINT = "http://23.23.71.250"
         USER = 'olivierdja'
         PRIVATE_KEY = credentials('private_key')
         ANSIBLE_IMAGE_AGENT = "registry.gitlab.com/robconnolly/docker-ansible:latest"
     }
     agent none
-    stages{
-        stage('Build Docker Image'){
+    stages {
+        stage('Build Docker Image') {
             agent any
-            steps{
+            steps {
                 script {
-                    sh 'docker build -t $USER/$INAGE_NAME:$INAGE_TAG ./APP/' 
+                    sh 'docker build -t ${USER}/${IMAGE_NAME}:${IMAGE_TAG} ./APP/' 
                 }
             }
         }
-         stage('Clean Up Existing Containers'){
+        stage('Clean Up Existing Containers') {
             agent any
-            steps{
+            steps {
                 script {
                     sh '''
-                    docker rm -f $INAGE_NAME || echo "Container does not exist"
-                    
+                    docker rm -f ${IMAGE_NAME} || echo "Container does not exist"
                     '''
                 }
             }
         }
-
-        stage('Launch Docker Container'){
+        stage('Launch Docker Container') {
             agent any
-            steps{
+            steps {
                 script {
                     sh '''
-                    docker run --name=$INAGE_NAME -dp 83:8080 $USER/$INAGE_NAME:$INAGE_TAG
+                    docker run --name=${IMAGE_NAME} -dp 83:8080 ${USER}/${IMAGE_NAME}:${IMAGE_TAG}
                     sleep 5
-                    
                     '''
                 }
             }
         }
-
-        stage('Run Tests'){
+        stage('Run Tests') {
             agent any
-            steps{
+            steps {
                 script {
                     sh '''
-                    curl $ENDPOINT:83 | grep "IC GROUP"
-                    
+                    curl ${ENDPOINT}:83 | grep "IC GROUP"
                     '''
                 }
             }
         }
-       
-
         stage('Upload Image to DockerHub') {
             agent any
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub_passowrd', usernameVariable: 'DOCKERHUB_CREDENTIALS_USR', passwordVariable: 'DOCKERHUB_CREDENTIALS_PSW')]) {
-                script {
-                    sh '''
-                    echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
-                    docker push $USER/$INAGE_NAME:$INAGE_TAG
-                    '''
+                withCredentials([usernamePassword(credentialsId: 'dockerhub_password', usernameVariable: 'DOCKERHUB_CREDENTIALS_USR', passwordVariable: 'DOCKERHUB_CREDENTIALS_PSW')]) {
+                    script {
+                        sh '''
+                        echo ${DOCKERHUB_CREDENTIALS_PSW} | docker login -u ${DOCKERHUB_CREDENTIALS_USR} --password-stdin
+                        docker push ${USER}/${IMAGE_NAME}:${IMAGE_TAG}
+                        '''
+                    }
+                }
             }
         }
-    }
-}
-
         stage('Prepare Ansible environment') {
             agent any
             steps {
                 script {
                     sh '''
-                        echo $PRIVATE_KEY > ./ansible_resources/id_rsa.pem
-                        chmod 600 id_rsa
+                    echo "${PRIVATE_KEY}" > ./ansible_resources/id_rsa.pem
+                    chmod 600 ./ansible_resources/id_rsa.pem
                     '''
                 }
             }
         }
-
-
         stage('Deploy application') {
             agent {
-                docker { image 'registry.gitlab.com/robconnolly/docker-ansible:latest' }
+                docker { image "${ANSIBLE_IMAGE_AGENT}" }
             }
-            stages {
-                stage('Ping targeted hosts') {
-                    steps {
-                        script {
-                            sh '''
-                                apt update -y
-                                anstall sshpass -y 
-                                export ANSIBLE_CONFIG=$(pwd)/ansible_ressources/ansible.cfg
-                                ansible all -i ./ansible_resources/hosts.yml - ping
-                            '''
-                        }
-                    }
+            steps {
+                script {
+                    sh '''
+                    apt update -y
+                    apt install sshpass -y
+                    export ANSIBLE_CONFIG=$(pwd)/ansible_resources/ansible.cfg
+                    ansible all -i ./ansible_resources/hosts.yml -m ping
+                    '''
                 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-
-
-        
-
-       
+            }
+        }
     }
 }
