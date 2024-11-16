@@ -74,7 +74,11 @@ pipeline {
         }
         stage('Deploy application') {
             agent {
-                docker { image "${ANSIBLE_IMAGE_AGENT}" }
+                docker { 
+                       image "${ANSIBLE_IMAGE_AGENT}"
+                       args '-u root'
+                       
+                       }
             }
             steps {
                 script {
