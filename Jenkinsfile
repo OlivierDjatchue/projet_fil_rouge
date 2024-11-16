@@ -55,7 +55,7 @@ pipeline {
                 script {
                     sh '''
                     echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
-                    docker push $USER/$INAGE_NAME:$INAGE_TAG
+                    docker push $USER/$IMAGE_NAME:$IMAGE_TAG
                     '''
             }
         }
