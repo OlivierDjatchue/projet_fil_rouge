@@ -5,6 +5,7 @@ pipeline{
         ENDPOINT="http://23.23.71.250"
         USER = 'olivierdja'
         PRIVATE_KEY = credentials('private_key')
+        ANSIBLE_IMAGE_AGENT = "registry.gitlab.com/robconnolly/docker-ansible:latest"
     }
     agent none
     stages{
@@ -79,6 +80,45 @@ pipeline{
                 }
             }
         }
+
+
+        stage('Deploy application') {
+            agent {
+                docker { image 'registry.gitlab.com/robconnolly/docker-ansible:latest' }
+            }
+            stages {
+                stage('Ping targeted hosts') {
+                    steps {
+                        script {
+                            sh '''
+                                apt update -y
+                                anstall sshpass -y 
+                                export ANSIBLE_CONFIG=$(pwd)/ansible_ressources/ansible.cfg
+                                ansible all -i ./ansible_resources/hosts.yml -m ping --private-key id_rsa 
+                            '''
+                        }
+                    }
+                }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         
 
