@@ -51,22 +51,22 @@ pipeline {
         stage('Upload Image to DockerHub') {
             agent any
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub_password', usernameVariable: 'DOCKERHUB_CREDENTIALS_USR', passwordVariable: 'DOCKERHUB_CREDENTIALS_PSW')]) {
-                    script {
-                        sh '''
-                        echo ${DOCKERHUB_CREDENTIALS_PSW} | docker login -u ${DOCKERHUB_CREDENTIALS_USR} --password-stdin
-                        docker push ${USER}/${IMAGE_NAME}:${IMAGE_TAG}
-                        '''
-                    }
-                }
+                withCredentials([usernamePassword(credentialsId: 'dockerhub_passowrd', usernameVariable: 'DOCKERHUB_CREDENTIALS_USR', passwordVariable: 'DOCKERHUB_CREDENTIALS_PSW')]) {
+                script {
+                    sh '''
+                    echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
+                    docker push $USER/$INAGE_NAME:$INAGE_TAG
+                    '''
             }
         }
+    }
+}
         stage('Prepare Ansible environment') {
             agent any
             steps {
                 script {
                     sh '''
-                    echo "${PRIVATE_KEY}" > ./ansible_resources/id_rsa.pem
+                    echo $PRIVATE_KEY > ./ansible_resources/id_rsa.pem
                     chmod 600 ./ansible_resources/id_rsa.pem
                     '''
                 }
