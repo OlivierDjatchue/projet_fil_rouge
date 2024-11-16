@@ -94,7 +94,7 @@ pipeline{
                                 apt update -y
                                 anstall sshpass -y 
                                 export ANSIBLE_CONFIG=$(pwd)/ansible_ressources/ansible.cfg
-                                ansible all -i ./ansible_resources/hosts.yml -m ping --private-key id_rsa 
+                                ansible all -i ./ansible_resources/hosts.yml - ping
                             '''
                         }
                     }
