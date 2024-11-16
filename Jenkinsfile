@@ -74,7 +74,7 @@ pipeline{
             steps {
                 script {
                     sh '''
-                        echo $PRIVATE_KEY > id_rsa
+                        echo $PRIVATE_KEY > ./ansible_resources/id_rsa.pem
                         chmod 600 id_rsa
                     '''
                 }
