@@ -76,7 +76,7 @@ pipeline {
             agent {
                 docker { 
                        image "${ANSIBLE_IMAGE_AGENT}"
-                       args '-u root'
+                      
                        
                        }
             }
