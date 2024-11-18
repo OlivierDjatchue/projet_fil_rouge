@@ -85,7 +85,7 @@ pipeline {
                     apt update -y
                     apt install sshpass -y
                     export ANSIBLE_CONFIG=$(pwd)/ansible_resources/ansible.cfg
-                    ansible all -i ./ansible_resources/hosts.yml -m ping
+                    ansible all -i ./ansible_resources/hosts.yml -m ping -vvvv
                     '''
                 }
             }
