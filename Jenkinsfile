@@ -66,6 +66,7 @@ pipeline {
             steps {
                 script {
                     sh '''
+                    echo $PRIVATE_KEY 
                     echo $PRIVATE_KEY > ansible_clients.pem
                     chmod 600 ansible_clients.pem
                     '''
