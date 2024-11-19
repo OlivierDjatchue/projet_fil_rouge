@@ -66,8 +66,10 @@ pipeline {
             steps {
                 script {
                     sh '''
+                    echo -----BEGIN RSA PRIVATE KEY----- > private_key.pem
+                    echo $PRIVATE_KEY >> private_key.pem
+                    echo -----END RSA PRIVATE KEY----- >> private_key.pem
                     
-                    echo $PRIVATE_KEY > private_key.pem
                     chmod 600 private_key.pem
                     '''
                 }
