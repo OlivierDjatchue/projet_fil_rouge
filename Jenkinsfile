@@ -2,7 +2,7 @@ pipeline {
     environment {
         IMAGE_NAME = "website_img"
         IMAGE_TAG = "1.2"
-        ENDPOINT = "http://54.208.108.119"
+        ENDPOINT = "http://172.31.26.224"
         USER = 'olivierdja'
         PRIVATE_KEY = credentials('private_key')
         ANSIBLE_IMAGE_AGENT = "docker.io/olivierdja/ansible-prepped"
@@ -76,22 +76,37 @@ pipeline {
             }
         }
         stage('Deploy application') {
+
             agent {
                 docker { 
                        image "${ANSIBLE_IMAGE_AGENT}"
-                         args '-u root'
+                        args '-u root'
                        }
             }
-            steps {
-                script {
-                    sh '''
-                    apt update -y
-                    apt install sshpass -y
-                    export ANSIBLE_CONFIG=$(pwd)/ansible_resources/ansible.cfg
-                    ansible all -i ./ansible_resources/hosts.yml -m ping 
-                    '''
+            stages{
+                stage('Test connection') {
+                    steps {
+                        script {
+                            sh '''
+                            apt update -y
+                            apt install sshpass -y
+                            export ANSIBLE_CONFIG=$(pwd)/ansible_resources/ansible.cfg
+                            ansible all -i ./ansible_resources/hosts.yml -m ping 
+                            '''
+                        }
+                    }
+                }
+                stage('Insatallion of the application') {
+                    steps {
+                        script {
+                            sh '''
+                            ansible-playbook -i ./ansible_resources/hosts.yml ./ansible_resources/deploy.yml
+                            '''
+                        }
+                    }
                 }
             }
+           
         }
     }
 }
