@@ -1,8 +1,15 @@
 ---
-- name: Install odoo and pgadmin
-  hosts: all
-  become: true 
+- name: Install Odoo on server1
+  hosts: server1
+  become: true
   roles:
     - odoo-role
+
+- name: Install pgAdmin on server2
+  hosts: server2
+  become: true
+  roles:
     - pgadmin-role
+
+ 
  
