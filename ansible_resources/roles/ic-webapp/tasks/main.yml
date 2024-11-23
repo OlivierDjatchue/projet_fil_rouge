@@ -1,5 +1,3 @@
-#launch the app
-#---
 #- name: "create ic_webapp_network"
 # roles/ic-webapp/tasks/main.yml
 - name: "create ic_webapp_network"
@@ -11,7 +9,7 @@
     name: "{{ ic_webapp_container }}"
     image: "{{ ic_webapp_image }}"  # Make sure this is set correctly
     ports:
-      - "{{ ic_webapp_port }}:8082"
+      - "{{ ic_webapp_port }}:8080"
     env:
       ODOO_URL: "{{ odoo_url }}"
       PGADMIN_URL: "{{ pgadmin_url }}"
