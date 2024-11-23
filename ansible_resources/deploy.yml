@@ -3,6 +3,7 @@
   hosts: server1
   become: true
   roles:
+    - ic-webapp-role
     - odoo-role
 
 - name: Install pgAdmin on server2
