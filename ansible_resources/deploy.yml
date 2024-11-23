@@ -3,13 +3,16 @@
   hosts: server1
   become: true
   roles:
+    - install-docker
     - ic-webapp-role
     - odoo-role
+    
 
 - name: Install pgAdmin on server2
   hosts: server2
   become: true
   roles:
+    - install-docker
     - pgadmin-role
 
  
