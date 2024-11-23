@@ -3,10 +3,10 @@
 ansible_python_interpreter: /usr/bin/python3
 ic_webapp_container: ic-webapp
 ic_webapp_image: "{{ docker_id }}/ic-webapp:1.0"
-ic_webapp_port: 83
+ic_webapp_port: 85
 odoo_url: "http://{{ host_odoo_ip }}:8069"
 pgadmin_url: "http://{{ host_pgadmin_ip }}:5050"
 ic_webapp_network: ic_network_webapp
-host_pgadmin_ip: "192.168.56.12"
-host_odoo_ip: "192.168.56.11"
-docker_id: alexzaza
+host_pgadmin_ip: "18.209.164.52"
+host_odoo_ip: "3.91.11.28"
+docker_id: olivierdja
