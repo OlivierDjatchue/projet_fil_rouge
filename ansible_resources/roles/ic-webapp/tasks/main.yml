@@ -11,7 +11,7 @@
     name: "{{ ic_webapp_container }}"
     image: "{{ ic_webapp_image }}"  # Make sure this is set correctly
     ports:
-      - "{{ ic_webapp_port }}:8080"
+      - "{{ ic_webapp_port }}:8082"
     env:
       ODOO_URL: "{{ odoo_url }}"
       PGADMIN_URL: "{{ pgadmin_url }}"
