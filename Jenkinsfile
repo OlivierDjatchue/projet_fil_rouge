@@ -2,7 +2,7 @@ pipeline {
     environment {
         IMAGE_NAME = "website_img"
         IMAGE_TAG = "1.2"
-        ENDPOINT = "http://100.27.198.70"
+        ENDPOINT = "http://3.80.59.3"
         USER = 'olivierdja'
         PRIVATE_KEY = credentials('private_key')
         ANSIBLE_IMAGE_AGENT = "docker.io/olivierdja/ansible-prepped"
