@@ -1,118 +1,82 @@
 ---
-# Step 1: Ensure we're on CentOS
-- name: Install EPEL repository (CentOS/RedHat)
-  yum:
-    name: epel-release
-    state: present
-  when: ansible_facts['os_family'] == "RedHat"
-
-# Clean yum cache after adding EPEL
-- name: Clean yum cache after adding EPEL
-  command: yum clean all
-  when: ansible_facts['os_family'] == "RedHat"
-
-# Install Python3 and pip3 (CentOS/RedHat)
-- name: Install Python3 and pip3
-  yum:
-    name:
-      - python3
-      - python3-pip
-    state: present
-  when: ansible_facts['os_family'] == "RedHat"
-
-# Ensure pip3 is installed using Python 3's built-in installer
-- name: Ensure pip3 is installed via Python 3
-  command: python3 -m ensurepip --upgrade
-  when: ansible_facts['os_family'] == "RedHat"
-
-# Upgrade pip3 if necessary
-- name: Upgrade pip3 to the latest version
-  command: python3 -m pip install --upgrade pip
-  when: ansible_facts['os_family'] == "RedHat"
-
-# Update all packages (CentOS and Amazon Linux)
-- name: Update all packages (CentOS and Amazon Linux)
+- name: Update System
   yum:
     name: "*"
     state: latest
-  when: ansible_facts['os_family'] == "RedHat"
 
-# Install required packages for Docker (CentOS and Amazon Linux)
-- name: Install required packages for Docker (CentOS and Amazon Linux)
+- name: Install prerequisites
   yum:
-    name:
-      - yum-utils
-      - device-mapper-persistent-data
-      - lvm2
+    name: "{{ item }}"
     state: present
+  with_items:
+    - yum-utils
+    - device-mapper-persistent-data
+    - lvm2
+    - python3
+    - python3-pip
+  when: ansible_distribution == "CentOS"
 
-# Add Docker CE repository (CentOS)
-- name: Add Docker CE repository (CentOS)
-  yum_repository:
-    name: docker-ce
-    description: Docker CE Repository
-    baseurl: https://download.docker.com/linux/centos/7/x86_64/stable
-    gpgcheck: yes
-    gpgkey: https://download.docker.com/linux/centos/gpg
-  when: ansible_facts['distribution'] == "CentOS"
-
-# Remove old Docker versions if they exist
-- name: Remove old Docker versions
+- name: Install pre-requisite packages
   yum:
-    name:
-      - docker
-      - docker-common
-      - docker-selinux
-      - docker-engine
-    state: absent
-  when: ansible_facts['os_family'] == "RedHat"
-
-# Install Docker
-- name: Install Docker
-  yum:
-    name: docker-ce
+    name: "{{ item }}"
     state: present
-  when: ansible_facts['os_family'] == "RedHat"
+  loop:
+    - yum-utils
+    - device-mapper-persistent-data
+    - lvm2
+    - python3
+  
+- name: download pip script
+  get_url:
+    url: https://bootstrap.pypa.io/pip/3.6/get-pip.py
+    dest: /tmp/get-pip.py
+- name: install python-pip
+  command: python3 /tmp/get-pip.py
+  ignore_errors: yes
+- name: Install docker python
+  pip:
+    name: docker-py
+    executable: /usr/local/bin/pip3
+- name: Add Docker ce repo
+  get_url:
+    url: https://download.docker.com/linux/centos/docker-ce.repo
+    dest: /etc/yum.repos.d/docker-ce.repo
+  when: ansible_distribution == "CentOS"
 
-# Ensure the 'docker' group exists (AFTER Docker is installed)
-- name: Ensure Docker group exists
-  group:
-    name: docker
+- name: "Install Docker on centos"
+  yum: 
+    name: docker 
     state: present
+  when: ansible_distribution == "CentOS"
 
-# Start and enable Docker service
-- name: Start and enable Docker service
-  systemd:
-    name: docker
-    state: started
-    enabled: yes
+- name: "Install Docker on Amazon Linux"
+  command: amazon-linux-extras install docker -y
+  args:
+    creates: /usr/bin/docker
+  when: ansible_distribution == "Amazon"
 
-# Add user to Docker group
-- name: Add user to Docker group
+- name: Add remote user to docker group
+  user:
+    name: "{{ ansible_user }}"
+    groups: dockerroot
+    append: yes
+  when: ansible_distribution == "CentOS"    
+
+- name: Add remote user to docker group on EC2
   user:
     name: "{{ ansible_user }}"
     groups: docker
     append: yes
-  when: ansible_distribution == "CentOS"
+  when: ansible_distribution == "Amazon"
 
-# Install Docker Compose
-- name: Install Docker Compose
+- name: Start and enable the Docker daemon
+  service: 
+    name: docker 
+    state: started 
+    enabled: yes
+
+- name: Install docker-compose
   get_url:
-    url: "https://github.com/docker/compose/releases/download/v2.5.1/docker-compose-{{ ansible_system }}-{{ ansible_architecture }}"
-    dest: /usr/local/bin/docker-compose
-    mode: '0755'
-  retries: 3
-  delay: 10
-  register: download_status
-  until: download_status is succeeded
-
-# Ensure Docker Compose is executable
-- name: Ensure Docker Compose is executable
-  file:
-    path: /usr/local/bin/docker-compose
-    mode: '0755'
-    state: file
-
-# Debug Docker Compose version
-- debug:
-    var: compose_version.stdout
+    url: https://github.com/docker/compose/releases/download/1.29.2/docker-compose-Linux-x86_64
+    dest: /usr/bin/docker-compose
+    mode: 0755    
