@@ -101,7 +101,7 @@ pipeline {
                     steps {
                         script {
                             sh '''
-                            echo $PWD
+                            export ANSIBLE_CONFIG = /var/jenkins_home/workspace/projet-fil-rouge/ansible.cfg
                             ansible-playbook -i ./ansible_resources/hosts.yml ./ansible_resources/playbooks/deploy-ic-webapp.yml -l ic_webapp_server
                             '''
                         }
@@ -111,6 +111,7 @@ pipeline {
                     steps {
                         script {
                             sh '''
+                            export ANSIBLE_CONFIG = /var/jenkins_home/workspace/projet-fil-rouge/ansible.cfg
                             ansible-playbook -i ./ansible_resources/hosts.yml ./ansible_resources/play/books/deploy-odoo.yml -l odoo_server
                             '''
                         }
@@ -120,6 +121,7 @@ pipeline {
                     steps {
                         script {
                             sh '''
+                            export ANSIBLE_CONFIG = /var/jenkins_home/workspace/projet-fil-rouge/ansible.cfg
                             ansible-playbook -i ./ansible_resources/hosts.yml ./ansible_resources/playbooks/deploy.yml -l pg_admin_server
                             '''
                         }
