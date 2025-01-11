@@ -96,11 +96,29 @@ pipeline {
                         }
                     }
                 }
-                stage('Insatallion of the application') {
+                stage('Insatallion of IC_Webapp') {
                     steps {
                         script {
                             sh '''
-                            ansible-playbook -i ./ansible_resources/hosts.yml ./ansible_resources/deploy.yml
+                            ansible-playbook -i ./ansible_resources/hosts.yml ./ansible_resources/deploy-ic-webapp.yml -l ic_webapp_server
+                            '''
+                        }
+                    }
+                }
+                 stage('Insatallion of odoo') {
+                    steps {
+                        script {
+                            sh '''
+                            ansible-playbook -i ./ansible_resources/hosts.yml ./ansible_resources/deploy-odoo.yml -l odoo_server
+                            '''
+                        }
+                    }
+                }
+                 stage('Insatallion of pgadmin') {
+                    steps {
+                        script {
+                            sh '''
+                            ansible-playbook -i ./ansible_resources/hosts.yml ./ansible_resources/deploy.yml -l pg_admin_server
                             '''
                         }
                     }
