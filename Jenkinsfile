@@ -101,6 +101,7 @@ pipeline {
                     steps {
                         script {
                             sh '''
+                            echo $PWD
                             ansible-playbook -i ./ansible_resources/hosts.yml ./ansible_resources/playbooks/deploy-ic-webapp.yml -l ic_webapp_server
                             '''
                         }
