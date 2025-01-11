@@ -96,6 +96,7 @@ pipeline {
                         }
                     }
                 }
+                
                 stage('Insatallion of IC_Webapp') {
                     steps {
                         script {
