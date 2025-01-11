@@ -4,8 +4,10 @@ pipeline {
         IMAGE_TAG = "1.2"
         ENDPOINT = "http://192.168.99.10"
         USER = 'olivierdja'
+        VAULT = credentials('vault_key')
         PRIVATE_KEY = credentials('private_key')
         ANSIBLE_IMAGE_AGENT = "docker.io/olivierdja/ansible-prepped"
+        
     }
     agent none
     stages {
@@ -66,11 +68,9 @@ pipeline {
             steps {
                 script {
                     sh '''
-                    echo -----BEGIN RSA PRIVATE KEY----- > private_key.pem
-                    echo $PRIVATE_KEY >> private_key.pem
-                    echo -----END RSA PRIVATE KEY----- >> private_key.pem
                     
-                    chmod 600 private_key.pem
+                    echo $VAULT > vault.key
+                 
                     '''
                 }
             }
