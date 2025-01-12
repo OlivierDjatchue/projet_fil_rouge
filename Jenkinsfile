@@ -112,7 +112,7 @@ pipeline {
                         script {
                             sh '''
                             export ANSIBLE_CONFIG=/var/jenkins_home/workspace/projet-fil-rouge/ansible_resources/ansible.cfg
-                            ansible-playbook -i ./ansible_resources/hosts.yml ./ansible_resources/play/books/deploy-odoo.yml -l odoo_server
+                            ansible-playbook -i ./ansible_resources/hosts.yml ./ansible_resources/playbooks/deploy-odoo.yml -l odoo_server
                             '''
                         }
                     }
