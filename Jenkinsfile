@@ -82,7 +82,7 @@ pipeline {
             agent {
                 docker { 
                        image "${ANSIBLE_IMAGE_AGENT}"
-                        args '-u root -v /etc/localtime:/etc/localtime:ro -v /etc/timezone:/etc/timezone:ro'
+                        args '-u root '
                        }
             }
             stages{
