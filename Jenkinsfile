@@ -82,8 +82,7 @@ pipeline {
             agent {
                 docker { 
                        image "${ANSIBLE_IMAGE_AGENT}"
-                       args '-u root -v /usr/share/zoneinfo/Europe/Paris:/etc/localtime:ro'
-
+                       args '-u root -e TZ=Europe/Paris'
                        }
             }
             stages{
